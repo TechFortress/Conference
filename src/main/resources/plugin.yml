@@ -1,0 +1,14 @@
+name: Conferences
+author: RoboMWM
+version: ${project.version}
+main: me.robomwm.Conference.Conference
+commands:
+    join:
+        usage: /join <conference>
+    part: {}
+    c:
+        usage: /c <message ...>
+    invite:
+        usage: /invite <player>
+    conferenceadmin:
+        usage: /conferenceadmin <delete|view|check|part> [player]
