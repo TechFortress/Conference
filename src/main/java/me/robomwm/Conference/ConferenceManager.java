@@ -39,6 +39,7 @@ public class ConferenceManager
         //check for existence of specified room, and create if it doesn't exist
         if (!this.conferenceRooms.containsKey(roomString))
         {
+            removeParticipant(player, true);
             ConferenceRoom room = new ConferenceRoom(roomString, player);
             this.conferenceRooms.put(roomString, room);
             this.conferenceParticipants.put(player, new ConferenceParticipant(room));
