@@ -3,73 +3,68 @@ package me.robomwm.Conference;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by robom on 5/22/2016.
  */
 public class ConferenceManager
 {
-    Map<String, ConferenceRoom> conferenceRooms = new HashMap<>();
-    Map<Player, String> conferenceDirectory = new HashMap<>();
+    private Map<String, ConferenceRoom> conferenceRooms = new HashMap<>();
+    private Map<Player, ConferenceParticipant> conferenceParticipants = new HashMap<>();
 
     /**
-     * Adds a player to a conference room
-     * returns -1 if the room does not exist
-     * returns 0 if the player was not invited to the room
-     * returns 1 if successful
-     * Removes player from their previous conference room if successful
-     * Broadcasts successful join to the room
-     * @param player
+     * Gets a stored ConferenceRoom
      * @param roomString
-     * @return
+     * @return null if the room does not exist
      */
-    public int addParticipant(Player player, String roomString)
+    public ConferenceRoom getConferenceRoom(String roomString)
     {
-        if (!this.conferenceRooms.containsKey(roomString))
-            return -1;
-
-        ConferenceRoom room = this.conferenceRooms.get(roomString);
-
-        if (!this.conferenceRooms.get(room).isInvited(player))
-            return 0;
-
-
-        removeParticipant(player);
-        room.addParticipant(player);
-        room.sendBroadcast(player.getName() + " joined the conference room.");
-        conferenceDirectory.put(player, roomString);
-        return 1;
+        return this.conferenceRooms.get(roomString.toLowerCase());
     }
 
     /**
      * Adds a player to a conference room, and creates one if the room doesn't exist
-     * returns -1 if the room did not exist and had to be created
-     * returns 0 if the player was not invited to the room
-     * returns 1 if successful
-     * removes player from their current conference room, if in one
+     * removes player from their prior conference room, if in one
+     * Broadcasts join to all conference participants
      * @param player
-     * @param room
-     * @return
+     * @param roomString
+     * @return -1 if the room did not exist and had to be created, 0 if player was not invited, 1 if successful
      */
-    public int createOrAddParticipant(Player player, String room)
+    public int addParticipant(Player player, String roomString)
     {
-        if (this.conferenceDirectory.containsKey(player))
-            this.conferenceRooms.get(this.conferenceDirectory.get(player)).removeParticipant(player);
-        if (!this.conferenceRooms.containsKey(room))
+        roomString = roomString.toLowerCase();
+
+        //check for existence of specified room, and create if it doesn't exist
+        if (!this.conferenceRooms.containsKey(roomString))
         {
-            conferenceRooms.put(room, new ConferenceRoom(room, player));
+            this.conferenceRooms.put(roomString, new ConferenceRoom(roomString, player));
+            this.conferenceParticipants.put(player, new ConferenceParticipant(this.getRoom(roomString)));
             return -1;
         }
-        //Otherwise if such a conference room exists, use addParticipant
-        return addParticipant(player, room);
+
+        ConferenceRoom room = this.conferenceRooms.get(roomString);
+
+        //Check if invited
+        if (!room.isInvited(player))
+            return 0;
+
+        //Otherwise, add and broadcast
+        removeParticipant(player, true);
+        room.addParticipant(player);
+        room.sendBroadcast(player.getName() + " joined the conference room.");
+        this.conferenceParticipants.put(player, new ConferenceParticipant(this.getRoom(roomString)));
+        return 1;
     }
 
-    public String getParticipantRoom(Player player)
+    /**
+     * Returns the conference room the player is in
+     * @param player
+     * @return null if it can't find stuff
+     */
+    public ConferenceRoom getParticipantRoom(Player player)
     {
-        return conferenceDirectory.get(player);
+        return conferenceParticipants.get(player).getConferenceRoom();
     }
 
     public ConferenceRoom getRoom(String room)
@@ -78,30 +73,53 @@ public class ConferenceManager
     }
 
     /**
-     * Used internally
      * Removes a player from a conference room
+     * Also deletes the conference room, if empty
      * @param player
+     * @return false if player was not a participant
      */
-    public void removeParticipant(Player player)
+    public boolean removeParticipant(Player player, boolean broadcastRemove)
     {
-        if (this.conferenceDirectory.containsKey(player))
+        if (this.conferenceParticipants.containsKey(player))
         {
-            ConferenceRoom room = this.conferenceRooms.get(this.conferenceDirectory.get(player));
+            ConferenceRoom room = this.conferenceRooms.get(this.conferenceParticipants.get(player));
+            if (broadcastRemove)
+                room.sendBroadcast(player.getName() + " left the conference room.");
             room.removeParticipant(player);
             removeRoomIfEmpty(room.getName());
-            this.conferenceDirectory.remove(player);
+            this.conferenceParticipants.remove(player);
+            return true;
         }
+        else
+            return false;
     }
 
     /**
      * Used internally
      * Removes a room if nobody is inside it.
-     * @param room
-     * @return
      */
-    public void removeRoomIfEmpty(String room)
+    public void removeRoomIfEmpty(String roomString)
     {
-        if (this.conferenceRooms.get(room).isEmpty())
-            conferenceRooms.remove(room);
+        if (this.conferenceRooms.get(roomString).isEmpty())
+            this.conferenceRooms.remove(roomString);
+    }
+
+    /**
+     * Removes a conference room and its participants
+     * @param roomString
+     * @return false if room doesn't exist
+     */
+    public boolean removeConferenceRoom(String roomString)
+    {
+        roomString = roomString.toLowerCase();
+        if (!this.conferenceRooms.containsKey(roomString))
+            return false;
+
+        ConferenceRoom room = this.conferenceRooms.get(roomString);
+
+        for (Player participant : room.getParticipants())
+            this.removeParticipant(participant, false);
+
+        this.conferenceRooms.remove(roomString);
     }
 }

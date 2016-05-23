@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,7 +18,7 @@ public class ConferenceRoom
 
     ConferenceRoom(String name, Player player)
     {
-        this.name = name;
+        this.name = name.toLowerCase();
         this.participants.add(player);
     }
 
@@ -37,6 +38,26 @@ public class ConferenceRoom
     {
         return participants.add(player);
     }
+    public Set<Player> getParticipants()
+    {
+        return participants;
+    }
+
+    /**
+     * @return A nicely formatted string of participants
+     */
+    public String getParticipantsToString()
+    {
+        StringBuilder participantsBuilder = new StringBuilder();
+        for (Player participant : getParticipants())
+        {
+            participantsBuilder.append(", ");
+            participantsBuilder.append(participant.getName());
+        }
+        participantsBuilder.delete(0, 2);
+        return participantsBuilder.toString();
+    }
+
     public boolean invite(Player player)
     {
         return invitees.add(player);

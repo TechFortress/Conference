@@ -1,5 +1,6 @@
 package me.robomwm.Conference;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -19,9 +20,7 @@ public class Conference extends JavaPlugin implements Listener
 {
     ConferenceManager conferenceManager = new ConferenceManager();
 
-    Map<String, HashSet<Player>> conferenceMap = new HashMap<>();
-    Map<Player, String> playerConferenceDirectory = new HashMap<>();
-    Map<String, HashSet<Player>> conferenceInvitees = new HashMap<>();
+    String notInAConference = ChatColor.RED + "You are not in a conference; " + ChatColor.GOLD + "/join <conference name>";
 
     public void onEnable()
     {
@@ -45,15 +44,11 @@ public class Conference extends JavaPlugin implements Listener
                  */
                 if (args[0].equalsIgnoreCase("delete"))
                 {
-                    if (!conferenceMap.containsKey(args[1]))
+                    if (!conferenceManager.removeConferenceRoom(args[1]))
                     {
                         sender.sendMessage(args[1] + ChatColor.RED + " conference does not exist.");
                         return true;
                     }
-
-                    for (Player participant : conferenceMap.get(args[1]))
-                        playerConferenceDirectory.remove(participant);
-                    conferenceMap.remove(args[1]);
                     sender.sendMessage("Deleted conference " + args[1]);
                     return true;
                 }
@@ -63,19 +58,15 @@ public class Conference extends JavaPlugin implements Listener
                  */
                 if (args[0].equalsIgnoreCase("view"))
                 {
-                    if (conferenceMap.containsKey(args[1]))
+                    ConferenceRoom room = conferenceManager.getRoom(args[1]);
+
+                    if (room == null)
                     {
                         sender.sendMessage(args[1] + ChatColor.RED + " conference does not exist.");
                         return true;
                     }
-
-                    StringBuilder participantsBuilder = new StringBuilder("Participants of " + args[1]);
-                    for (Player participant : conferenceMap.get(args[1]))
-                    {
-                        participantsBuilder.append(", ");
-                        participantsBuilder.append(participant.getName());
-                    }
-                    sender.sendMessage(participantsBuilder.toString());
+                    sender.sendMessage("Participants of " + room.getName());
+                    sender.sendMessage(room.getParticipantsToString());
                     return true;
                 }
 
@@ -84,11 +75,21 @@ public class Conference extends JavaPlugin implements Listener
                  */
                 if (args[0].equalsIgnoreCase("check"))
                 {
-                    String message = playerConferenceDirectory.get(Bukkit.getPlayerExact(args[1]));
-                    if (message == null)
+                    //Can I do this and just check message for null? String message = conferenceManager.getParticipantRoom(Bukkit.getPlayerExact(args[1])).getName();
+
+                    Player checkPlayer = Bukkit.getPlayerExact(args[1]);
+                    if (checkPlayer == null)
+                    {
+                        sender.sendMessage(args[1] + " does not exist/is not online.");
+                        return true;
+                    }
+                    ConferenceRoom room = conferenceManager.getParticipantRoom(checkPlayer);
+                    if (room == null)
+                    {
                         sender.sendMessage("Player is not part of a conference");
-                    else
-                        sender.sendMessage(message);
+                        return true;
+                    }
+                    sender.sendMessage(room.getName());
                     return true;
                 }
 
@@ -97,11 +98,26 @@ public class Conference extends JavaPlugin implements Listener
                  */
                 if (args[0].equalsIgnoreCase("part"))
                 {
-                    if (partConference(Bukkit.getPlayerExact(args[1])))
+                    Player partPlayer = Bukkit.getPlayerExact(args[1]);
+                    if (partPlayer != null && conferenceManager.removeParticipant(partPlayer, true))
                         sender.sendMessage("Successfully parted player.");
                     else
                         sender.sendMessage("Was unable to part player. Either player is not online or is not part of a conference.");
                     return true;
+                }
+
+                /**
+                 * Broadcast a message to a specific room
+                 */
+                if (args[0].equalsIgnoreCase("broadcast"))
+                {
+                    ConferenceRoom room = conferenceManager.getRoom(args[1]);
+                    if (room == null)
+                    {
+                        sender.sendMessage("That room does not exist.");
+                        return true;
+                    }
+                    room.sendBroadcast(StringUtils.join(args, " ", 2, args.length));
                 }
                 return false;
             }
@@ -122,10 +138,10 @@ public class Conference extends JavaPlugin implements Listener
          */
         if (cmd.getName().equalsIgnoreCase("part"))
         {
-            if (partConference(player))
-                player.sendMessage(ChatColor.GREEN + "You left the conference.");
+            if (conferenceManager.removeParticipant(player))
+                player.sendMessage(ChatColor.GREEN + "You left the conference room.");
             else
-                player.sendMessage(ChatColor.RED + "You are not in a conference.");
+                player.sendMessage(ChatColor.RED + "You are not in a conference room.");
             return true;
         }
 
@@ -140,7 +156,7 @@ public class Conference extends JavaPlugin implements Listener
             String conference = playerConferenceDirectory.get(player);
             if (conference == null) //If not in a conference
             {
-                player.sendMessage(ChatColor.RED + "You are not in a conference; " + ChatColor.GOLD + "/join <conference name>");
+                player.sendMessage(notInAConference);
                 return true;
             }
 
@@ -178,8 +194,10 @@ public class Conference extends JavaPlugin implements Listener
                 player.sendMessage(ChatColor.RED + "Doesn't look like " + ChatColor.AQUA + args[1] + ChatColor.RED + " is online or a valid name.");
                 return true;
             }
-            else
-                invitePlayer(player, invitee);
+
+            if (!conferenceManager.getParticipantRoom(player).invite(invitee))
+
+
             return true;
         }
         sender.sendMessage("Whoops, did you make a mistake? Don't forget about " + ChatColor.GOLD + "/help");
