@@ -68,6 +68,9 @@ public class ConferenceManager
      */
     public ConferenceRoom getParticipantRoom(Player player)
     {
+        ConferenceParticipant participant = this.conferenceParticipants.get(player);
+        if (participant == null)
+            return null;
         return conferenceParticipants.get(player).getConferenceRoom();
     }
 
