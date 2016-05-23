@@ -42,8 +42,8 @@ public class ConferenceManager
             ConferenceRoom room = new ConferenceRoom(roomString, player);
             this.conferenceRooms.put(roomString, room);
             this.conferenceParticipants.put(player, new ConferenceParticipant(room));
-            room.sendBroadcast(ChatColor.GREEN + "Successfully created a new conference room named " + ChatColor.BLUE + roomString);
-            room.sendBroadcast("Use " + ChatColor.GOLD + "/invite " + ChatColor.RESET + "to allow others to join your conference.");
+            room.sendBroadcast(ChatColor.GREEN + "Successfully created a new conference room");
+            room.sendBroadcast("Use " + ChatColor.GOLD + "/invite " + ChatColor.DARK_AQUA + "to allow others to join your conference.");
             return true;
         }
 

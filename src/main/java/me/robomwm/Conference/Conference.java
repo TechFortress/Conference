@@ -158,7 +158,7 @@ public class Conference extends JavaPlugin implements Listener
                 return true;
             }
 
-            room.sendBroadcast(player.getName() + ": " + args.toString());
+            room.sendBroadcast(player.getName() + ": " + Arrays.toString(args));
             return true;
         }
 
