@@ -127,8 +127,6 @@ public class Conference extends JavaPlugin implements Listener
         /**
          * Player commands
          */
-
-
         if (!(sender instanceof Player))
             return false;
         Player player = (Player)sender;
@@ -138,7 +136,7 @@ public class Conference extends JavaPlugin implements Listener
          */
         if (cmd.getName().equalsIgnoreCase("part"))
         {
-            if (conferenceManager.removeParticipant(player))
+            if (conferenceManager.removeParticipant(player, true))
                 player.sendMessage(ChatColor.GREEN + "You left the conference room.");
             else
                 player.sendMessage(ChatColor.RED + "You are not in a conference room.");
@@ -153,18 +151,14 @@ public class Conference extends JavaPlugin implements Listener
             if (args.length < 1)
                 return false;
 
-            String conference = playerConferenceDirectory.get(player);
-            if (conference == null) //If not in a conference
+            ConferenceRoom room = conferenceManager.getParticipantRoom(player);
+            if (room == null) //If not in a conference
             {
                 player.sendMessage(notInAConference);
                 return true;
             }
 
-            //put message together
-            String message = ChatColor.BLUE + "[" + conference + "] " + player.getName() + ":" + ChatColor.DARK_AQUA + args.toString().substring(2);
-            //and send it to the conference participants
-            for (Player participants : conferenceMap.get(conference))
-                participants.sendMessage(message);
+            room.sendBroadcast(player.getName() + ": " + args.toString());
             return true;
         }
 
@@ -195,8 +189,15 @@ public class Conference extends JavaPlugin implements Listener
                 return true;
             }
 
-            if (!conferenceManager.getParticipantRoom(player).invite(invitee))
+            ConferenceRoom room = conferenceManager.getParticipantRoom(player);
 
+            if (room.invite(invitee))
+            {
+                room.sendBroadcast(player.getName() + " invited " + invitee.getName());
+                player.sendMessage(ChatColor.GREEN + invitee.getName() + " can now " + ChatColor.GOLD + "/join " + room.getName());
+            }
+            else //already invited
+                player.sendMessage(invitee.getName() + " was already invited. Tell them to use " + ChatColor.GOLD + "/join " + room.getName());
 
             return true;
         }
@@ -204,120 +205,32 @@ public class Conference extends JavaPlugin implements Listener
         return true;
     }
 
-    /**
-     * Causes a player to join a conference.
-     * If the player is a participant of another conference, it will remove them from that conference
-     * @param conference
-     * @param player
-     * @return
-     */
     void joinConference(String conference, Player player)
     {
-        //If they're a participant of another conference, remove them from that conference
-        partConference(player);
-
-        //If the specified conference room doesn't exist...
-        if (!conferenceMap.containsKey(conference))
+        //Creating conferences require permission
+        if (conferenceManager.getRoom(conference) == null)
         {
-            //Creating conferences require permission
             if (!player.hasPermission("tech.supporter") && !player.hasPermission("tf.we"))
             {
                 player.sendMessage("In order to create a new conference, please watch an " + ChatColor.GOLD + "/ad");
                 player.chat("/ad");
                 return;
             }
+        }
 
-            conferenceMap.put(conference, new HashSet<>()); //Create the conference room
-            conferenceMap.get(conference).add(player); //Add the player to it
-            playerConferenceDirectory.put(player, conference);
-            player.sendMessage(ChatColor.GREEN + "Successfully created a new conference room named " + ChatColor.BLUE + conference);
-            player.sendMessage("Use " + ChatColor.GOLD + "/invite " + ChatColor.RESET + "to allow others to join your conference.");
+        if(conferenceManager.addParticipant(player, conference))
+        {
             player.sendMessage("Use " + ChatColor.GOLD + "/c <message> " + ChatColor.RESET + "to send messages to the conference.");
             player.sendMessage("Use " + ChatColor.GOLD + "/part " + ChatColor.RESET + "to leave the conference.");
             return;
         }
-
-        //If player has not yet been invited to that conference
-        if (!conferenceInvitees.containsKey(conference) || !conferenceInvitees.get(conference).contains(player))
-        {
+        else //not invited
             player.sendMessage(ChatColor.RED + "You have not been invited to this conference.");
-            return;
-        }
-
-        //Add player to conference and notify all participants
-        conferenceMap.get(conference).add(player);
-        String message = ChatColor.BLUE + "[" + conference + "] " + ChatColor.DARK_AQUA + player.getName() + " joined the conference room.";
-        for (Player participants : conferenceMap.get(conference))
-            participants.sendMessage(message);
-        player.sendMessage("Use " + ChatColor.GOLD + "/c <message> " + ChatColor.RESET + "to send messages to the conference.");
-        player.sendMessage("Use " + ChatColor.GOLD + "/part " + ChatColor.RESET + "to leave the conference.");
-    }
-
-    /**
-     * Causes a player to leave a conference
-     * Returns false if player wasn't part of a conference in the first place, true otherwise.
-     * Deletes the conference if the conference is empty
-     * Otherwise, notifies all remaining participants of that conference of their departure
-     * @param player
-     */
-    boolean partConference(Player player)
-    {
-        String conference = playerConferenceDirectory.get(player);
-        if (conference == null) //No conference to part
-            return false;
-        playerConferenceDirectory.remove(player);
-        conferenceMap.get(conference).remove(player);
-
-        //Remove conference if empty
-        if (conferenceMap.get(conference).isEmpty())
-        {
-            conferenceMap.remove(conference);
-            conferenceInvitees.remove(conference);
-            return true;
-        }
-
-        //Otherwise, notify remaining participants
-        for (Player participants : conferenceMap.get(conference))
-            participants.sendMessage(ChatColor.BLUE + player.getName() + " left " + conference);
-        return true;
-    }
-
-    /**
-     * Invites a player to a conference
-     */
-    void invitePlayer(Player player, Player invitee)
-    {
-        //Check if player is in a conference
-        if (!playerConferenceDirectory.containsKey(player))
-        {
-            player.sendMessage(ChatColor.RED + "You are not in a conference; " + ChatColor.GOLD + "/join <conference name>");
-            return;
-        }
-        //Check if invitee is already in another conference
-        if (playerConferenceDirectory.containsKey(invitee))
-        {
-            player.sendMessage(ChatColor.RED + invitee.getName() + " is already in another conference.");
-            return;
-        }
-
-        String conference = playerConferenceDirectory.get(player);
-
-        //Check if invitee has already been invited
-        if (conferenceInvitees.containsKey(conference) && conferenceInvitees.get(conference).contains(player))
-        {
-            player.sendMessage(ChatColor.RED + invitee.getName() + " has already been invited to this conference.");
-            return;
-        }
-
-        String message = ChatColor.BLUE + "[" + conference + "] " + ChatColor.DARK_AQUA + player.getName() + " invited " + invitee.getName();
-        conferenceInvitees.get(conference).add(invitee);
-        for (Player participants : conferenceMap.get(conference))
-            participants.sendMessage(message);
     }
 
     @EventHandler
     void onPlayerQuit(PlayerQuitEvent event)
     {
-        partConference(event.getPlayer());
+        conferenceManager.removeParticipant(event.getPlayer(), true);
     }
 }

@@ -1,5 +1,6 @@
 package me.robomwm.Conference;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -29,32 +30,35 @@ public class ConferenceManager
      * Broadcasts join to all conference participants
      * @param player
      * @param roomString
-     * @return -1 if the room did not exist and had to be created, 0 if player was not invited, 1 if successful
+     * @return False: player wasn't invited. True: successful
      */
-    public int addParticipant(Player player, String roomString)
+    public boolean addParticipant(Player player, String roomString)
     {
         roomString = roomString.toLowerCase();
 
         //check for existence of specified room, and create if it doesn't exist
         if (!this.conferenceRooms.containsKey(roomString))
         {
-            this.conferenceRooms.put(roomString, new ConferenceRoom(roomString, player));
-            this.conferenceParticipants.put(player, new ConferenceParticipant(this.getRoom(roomString)));
-            return -1;
+            ConferenceRoom room = new ConferenceRoom(roomString, player);
+            this.conferenceRooms.put(roomString, room);
+            this.conferenceParticipants.put(player, new ConferenceParticipant(room));
+            room.sendBroadcast(ChatColor.GREEN + "Successfully created a new conference room named " + ChatColor.BLUE + roomString);
+            room.sendBroadcast("Use " + ChatColor.GOLD + "/invite " + ChatColor.RESET + "to allow others to join your conference.");
+            return true;
         }
 
         ConferenceRoom room = this.conferenceRooms.get(roomString);
 
         //Check if invited
         if (!room.isInvited(player))
-            return 0;
+            return false;
 
         //Otherwise, add and broadcast
         removeParticipant(player, true);
         room.addParticipant(player);
         room.sendBroadcast(player.getName() + " joined the conference room.");
         this.conferenceParticipants.put(player, new ConferenceParticipant(this.getRoom(roomString)));
-        return 1;
+        return true;
     }
 
     /**
@@ -121,5 +125,6 @@ public class ConferenceManager
             this.removeParticipant(participant, false);
 
         this.conferenceRooms.remove(roomString);
+        return true;
     }
 }
