@@ -1,5 +1,6 @@
 package me.robomwm.Conference;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -20,13 +21,45 @@ public class ConferenceRoom
         this.participants.add(player);
     }
 
-    public boolean removeParticipant(ConferenceParticipant participant)
+    public String getName()
     {
-        if (participants.remove(participant))
-            return true;
-        else
-            return false;
+        return this.name;
+    }
+    public boolean isEmpty()
+    {
+        return this.participants.isEmpty();
+    }
+    public boolean removeParticipant(Player participant)
+    {
+        return participants.remove(participant);
+    }
+    public boolean addParticipant(Player player)
+    {
+        return participants.add(player);
+    }
+    public boolean invite(Player player)
+    {
+        return invitees.add(player);
     }
 
-    public boolean addParticipant()
+    /**
+     * Broadcasts a message to all conference participants
+     * @param inputMessage
+     */
+    public void sendBroadcast(String inputMessage)
+    {
+        String message = ChatColor.BLUE + "[" + this.name + "] " + ChatColor.DARK_AQUA + inputMessage;
+        for (Player participants : this.participants)
+            participants.sendMessage(message);
+    }
+
+    /**
+     * Is the player invited to this conference?
+     * @param player
+     * @return
+     */
+    public boolean isInvited(Player player)
+    {
+        return invitees.contains(player);
+    }
 }
