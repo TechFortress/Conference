@@ -5,7 +5,8 @@ main: me.robomwm.Conference.Conference
 commands:
     join:
         usage: /join <conference>
-    part: {}
+    part:
+        aliases: [leave, quit]
     c:
         usage: /c <message ...>
     invite:
