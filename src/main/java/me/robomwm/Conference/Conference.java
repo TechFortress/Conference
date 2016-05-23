@@ -18,13 +18,15 @@ import java.util.*;
  */
 public class Conference extends JavaPlugin implements Listener
 {
-    ConferenceManager conferenceManager = new ConferenceManager();
+    private ConferenceManager conferenceManager;
 
-    String notInAConference = ChatColor.RED + "You are not in a conference; " + ChatColor.GOLD + "/join <conference name>";
+    String notInAConference = ChatColor.RED + "You are not in a conference. Use " + ChatColor.GOLD + "/join <room name>";
+    String cannotInviteSelf = ChatColor.RED + "Yea um, no need to invite yourself.";
 
     public void onEnable()
     {
         getServer().getPluginManager().registerEvents(this, this);
+        conferenceManager = new ConferenceManager();
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
@@ -191,7 +193,16 @@ public class Conference extends JavaPlugin implements Listener
             }
 
             ConferenceRoom room = conferenceManager.getParticipantRoom(player);
-
+            if (room == null)
+            {
+                player.sendMessage(notInAConference);
+                return true;
+            }
+            if (player == invitee)
+            {
+                player.sendMessage(cannotInviteSelf);
+                return true;
+            }
             if (room.invite(invitee))
             {
                 room.sendBroadcast(player.getName() + " invited " + invitee.getName());
