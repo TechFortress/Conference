@@ -90,7 +90,7 @@ public class ConferenceManager
         if (this.conferenceParticipants.containsKey(player))
         {
             ConferenceRoom room = this.conferenceRooms.get(this.conferenceParticipants.get(player));
-            if (broadcastRemove)
+            if (broadcastRemove && !room.isEmpty())
                 room.sendBroadcast(player.getName() + " left the conference room.");
             room.removeParticipant(player);
             removeRoomIfEmpty(room.getName());
