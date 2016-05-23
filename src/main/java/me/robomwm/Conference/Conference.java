@@ -188,7 +188,7 @@ public class Conference extends JavaPlugin implements Listener
             Player invitee = Bukkit.getPlayerExact(args[0]);
             if (invitee == null || !player.canSee(invitee))
             {
-                player.sendMessage(ChatColor.RED + "Doesn't look like " + ChatColor.AQUA + args[1] + ChatColor.RED + " is online or a valid name.");
+                player.sendMessage(ChatColor.RED + "Doesn't look like " + ChatColor.AQUA + args[0] + ChatColor.RED + " is online or a valid name.");
                 return true;
             }
 
