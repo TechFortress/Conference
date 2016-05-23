@@ -17,6 +17,7 @@ import java.util.*;
  */
 public class Conference extends JavaPlugin implements Listener
 {
+    ConferenceManager conferenceManager = new ConferenceManager();
 
     Map<String, HashSet<Player>> conferenceMap = new HashMap<>();
     Map<Player, String> playerConferenceDirectory = new HashMap<>();
@@ -210,10 +211,11 @@ public class Conference extends JavaPlugin implements Listener
 
             conferenceMap.put(conference, new HashSet<>()); //Create the conference room
             conferenceMap.get(conference).add(player); //Add the player to it
+            playerConferenceDirectory.put(player, conference);
             player.sendMessage(ChatColor.GREEN + "Successfully created a new conference room named " + ChatColor.BLUE + conference);
             player.sendMessage("Use " + ChatColor.GOLD + "/invite " + ChatColor.RESET + "to allow others to join your conference.");
             player.sendMessage("Use " + ChatColor.GOLD + "/c <message> " + ChatColor.RESET + "to send messages to the conference.");
-            player.sendMessage("Use " + ChatColor.GOLD + "/part" + ChatColor.RESET + "to leave the conference.");
+            player.sendMessage("Use " + ChatColor.GOLD + "/part " + ChatColor.RESET + "to leave the conference.");
             return;
         }
 
@@ -230,7 +232,7 @@ public class Conference extends JavaPlugin implements Listener
         for (Player participants : conferenceMap.get(conference))
             participants.sendMessage(message);
         player.sendMessage("Use " + ChatColor.GOLD + "/c <message> " + ChatColor.RESET + "to send messages to the conference.");
-        player.sendMessage("Use " + ChatColor.GOLD + "/part" + ChatColor.RESET + "to leave the conference.");
+        player.sendMessage("Use " + ChatColor.GOLD + "/part " + ChatColor.RESET + "to leave the conference.");
     }
 
     /**

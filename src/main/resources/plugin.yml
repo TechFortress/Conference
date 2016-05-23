@@ -1,4 +1,4 @@
-name: Conferences
+name: Conference
 author: RoboMWM
 version: ${project.version}
 main: me.robomwm.Conference.Conference
