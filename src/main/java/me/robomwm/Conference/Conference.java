@@ -118,6 +118,7 @@ public class Conference extends JavaPlugin implements Listener
                         return true;
                     }
                     room.sendBroadcast(StringUtils.join(args, " ", 2, args.length));
+                    return true;
                 }
                 return false;
             }
@@ -158,7 +159,7 @@ public class Conference extends JavaPlugin implements Listener
                 return true;
             }
 
-            room.sendBroadcast(player.getName() + ": " + Arrays.toString(args));
+            room.sendBroadcast(player.getName() + ": " + StringUtils.join(args, " "));
             return true;
         }
 
