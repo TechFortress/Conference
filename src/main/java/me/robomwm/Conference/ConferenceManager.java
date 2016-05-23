@@ -122,7 +122,7 @@ public class ConferenceManager
         ConferenceRoom room = this.conferenceRooms.get(roomString);
 
         for (Player participant : room.getParticipants())
-            this.removeParticipant(participant, false);
+            this.conferenceParticipants.remove(participant);
 
         this.conferenceRooms.remove(roomString);
         return true;
