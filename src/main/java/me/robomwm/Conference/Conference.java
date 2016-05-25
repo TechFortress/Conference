@@ -218,13 +218,13 @@ public class Conference extends JavaPlugin implements Listener
         if (cmd.getName().equalsIgnoreCase("who"))
         {
             ConferenceRoom room = conferenceManager.getParticipantRoom(player);
-            if (room == null)
+            if (room != null)
             {
-                player.sendMessage(notInAConference);
+                player.sendMessage(ChatColor.DARK_AQUA + "Participants of " + ChatColor.BLUE + room.getName() + ":");
+                player.sendMessage(ChatColor.DARK_AQUA + room.getParticipantsToString());
                 return true;
             }
-            sender.sendMessage(ChatColor.DARK_AQUA + "Participants of " + ChatColor.BLUE + room.getName() + ":");
-            player.sendMessage(ChatColor.DARK_AQUA + room.getParticipantsToString());
+            //Don't return false if not in room, instead command doesn't exist.
         }
         sender.sendMessage("Whoops, did you make a mistake? Don't forget about " + ChatColor.GOLD + "/help");
         return true;

@@ -13,3 +13,4 @@ commands:
         usage: /invite <player>
     conferenceadmin:
         usage: /conferenceadmin <delete|view|check|part> [player]
+    who: {}
