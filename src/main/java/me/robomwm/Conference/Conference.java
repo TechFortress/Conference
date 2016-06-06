@@ -198,6 +198,7 @@ public class Conference extends JavaPlugin implements Listener
                 player.sendMessage(cannotInviteSelf);
                 return true;
             }
+
             if (room.invite(invitee))
             {
                 room.sendBroadcast(player.getName() + " invited " + invitee.getName());

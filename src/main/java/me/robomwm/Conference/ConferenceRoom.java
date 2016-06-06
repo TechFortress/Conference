@@ -20,6 +20,7 @@ public class ConferenceRoom
     {
         this.name = name.toLowerCase();
         this.participants.add(player);
+        invitees.add(player);
     }
 
     public String getName()
