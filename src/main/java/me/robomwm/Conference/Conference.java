@@ -137,9 +137,7 @@ public class Conference extends JavaPlugin implements Listener
          */
         if (cmd.getName().equalsIgnoreCase("part"))
         {
-            if (conferenceManager.removeParticipant(player, true))
-                player.sendMessage(ChatColor.GREEN + "You left the conference room.");
-            else
+            if (!conferenceManager.removeParticipant(player, true))
                 player.sendMessage(ChatColor.RED + "You are not in a conference room.");
             return true;
         }
@@ -158,8 +156,7 @@ public class Conference extends JavaPlugin implements Listener
                 player.sendMessage(notInAConference);
                 return true;
             }
-
-            room.sendBroadcast(player.getName() + ": " + StringUtils.join(args, " "));
+            room.sendBroadcast(player.getName() + ": " + ChatColor.AQUA + StringUtils.join(args, " "));
             return true;
         }
 
