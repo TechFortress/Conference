@@ -243,6 +243,12 @@ public class Conference extends JavaPlugin implements Listener
                 return;
             }
         }
+        //Check if player is attempting to join the same room
+        else if((conferenceManager.getParticipantRoom(player) != null) && (conferenceManager.getParticipantRoom(player).equals(conferenceManager.getRoom(conference))))
+        {
+            player.sendMessage("You are already in room " + conference);
+            return;
+        }
 
         if(conferenceManager.addParticipant(player, conference))
         {
