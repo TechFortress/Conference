@@ -5,12 +5,12 @@ main: me.robomwm.Conference.Conference
 commands:
     join:
         usage: /join <conference room> - Joins a conference room. Automatically creates a new room if the specified room name does not exist.
+        aliases: [cjoin]
     part:
-        aliases: [leave, quit]
+        aliases: [leave, quit, cquit]
     c:
         usage: /c <message ...>
-    invite:
-        usage: /invite <player>
     confadmin:
         usage: /confadmin <delete|view|check|part|broadcast> [player|room]
-    who: {}
+    who:
+        aliases: [see, clist]

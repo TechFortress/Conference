@@ -30,7 +30,7 @@ public class ConferenceManager
      * Broadcasts join to all conference participants
      * @param player
      * @param roomString
-     * @return False: player wasn't invited. True: successful
+     * @return No longer used, always returns true. (Was previously used for invite)
      */
     public boolean addParticipant(Player player, String roomString)
     {
@@ -44,17 +44,13 @@ public class ConferenceManager
             this.conferenceRooms.put(roomString, room);
             this.conferenceParticipants.put(player, new ConferenceParticipant(room));
             room.sendBroadcast(ChatColor.GREEN + "Successfully created a new conference room");
-            room.sendBroadcast("Use " + ChatColor.GOLD + "/invite " + ChatColor.DARK_AQUA + "to allow others to join your conference.");
+            room.sendBroadcast("Tell other players to " + ChatColor.GOLD + "/join " + roomString);
             return true;
         }
 
         ConferenceRoom room = this.conferenceRooms.get(roomString);
 
-        //Check if invited
-        if (!room.isInvited(player))
-            return false;
-
-        //Otherwise, add and broadcast
+        //Otherwise if it exists, just add player to room and broadcast
         removeParticipant(player, true);
         room.addParticipant(player);
         room.sendBroadcast(player.getName() + " joined the conference room.");

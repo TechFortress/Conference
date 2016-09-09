@@ -14,13 +14,11 @@ public class ConferenceRoom
 {
     String name = "";
     Set<Player> participants = new HashSet<>();
-    Set<Player> invitees = new HashSet<>();
 
     ConferenceRoom(String name, Player player)
     {
         this.name = name.toLowerCase();
         this.participants.add(player);
-        invitees.add(player);
     }
 
     public String getName()
@@ -59,11 +57,6 @@ public class ConferenceRoom
         return participantsBuilder.toString();
     }
 
-    public boolean invite(Player player)
-    {
-        return invitees.add(player);
-    }
-
     /**
      * Broadcasts a message to all conference participants
      * @param inputMessage
@@ -73,15 +66,5 @@ public class ConferenceRoom
         String message = ChatColor.BLUE + "#" + this.name + " " + ChatColor.DARK_AQUA + inputMessage;
         for (Player participants : this.participants)
             participants.sendMessage(message);
-    }
-
-    /**
-     * Is the player invited to this conference?
-     * @param player
-     * @return
-     */
-    public boolean isInvited(Player player)
-    {
-        return invitees.contains(player);
     }
 }

@@ -21,7 +21,6 @@ public class Conference extends JavaPlugin implements Listener
     private ConferenceManager conferenceManager;
 
     String notInAConference = ChatColor.RED + "You are not in a conference. Use " + ChatColor.GOLD + "/join <room name>";
-    String cannotInviteSelf = ChatColor.RED + "Yea um, no need to invite yourself.";
 
     public void onEnable()
     {
@@ -173,44 +172,6 @@ public class Conference extends JavaPlugin implements Listener
         }
 
         /**
-         * Conference invite command
-         */
-        if (cmd.getName().equalsIgnoreCase("invite"))
-        {
-            if (args.length < 1)
-                return false;
-
-            Player invitee = Bukkit.getPlayerExact(args[0]);
-            if (invitee == null || !player.canSee(invitee))
-            {
-                player.sendMessage(ChatColor.RED + "Doesn't look like " + ChatColor.AQUA + args[0] + ChatColor.RED + " is online or a valid name.");
-                return true;
-            }
-
-            ConferenceRoom room = conferenceManager.getParticipantRoom(player);
-            if (room == null)
-            {
-                player.sendMessage(notInAConference);
-                return true;
-            }
-            if (player == invitee)
-            {
-                player.sendMessage(cannotInviteSelf);
-                return true;
-            }
-
-            if (room.invite(invitee))
-            {
-                room.sendBroadcast(player.getName() + " invited " + invitee.getName());
-                player.sendMessage(ChatColor.GREEN + invitee.getName() + " can now " + ChatColor.GOLD + "/join " + room.getName());
-            }
-            else //already invited
-                player.sendMessage(invitee.getName() + " was already invited. Tell them to use " + ChatColor.GOLD + "/join " + room.getName());
-
-            return true;
-        }
-
-        /**
          * who command (lists players in current conference room)
          */
         if (cmd.getName().equalsIgnoreCase("who"))
@@ -257,8 +218,6 @@ public class Conference extends JavaPlugin implements Listener
             player.sendMessage("Use " + ChatColor.GOLD + "/who " + ChatColor.RESET + "to see who's in this room.");
             return;
         }
-        else //not invited
-            player.sendMessage(ChatColor.RED + "You have not been invited to this conference.");
     }
 
     @EventHandler
