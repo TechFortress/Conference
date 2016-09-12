@@ -194,16 +194,6 @@ public class Conference extends JavaPlugin implements Listener
         if (conference.startsWith("#"))
             conference = conference.substring(1);
 
-        //Creating conferences require permission
-        if (conferenceManager.getRoom(conference) == null)
-        {
-            if (!player.hasPermission("tech.supporter") && !player.hasPermission("tf.we"))
-            {
-                player.sendMessage("In order to create a new conference, please watch an " + ChatColor.GOLD + "/ad");
-                player.chat("/ad");
-                return;
-            }
-        }
         //Check if player is attempting to join the same room
         else if((conferenceManager.getParticipantRoom(player) != null) && (conferenceManager.getParticipantRoom(player).equals(conferenceManager.getRoom(conference))))
         {
