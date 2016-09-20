@@ -67,4 +67,16 @@ public class ConferenceRoom
         for (Player participants : this.participants)
             participants.sendMessage(message);
     }
+
+    /**
+     * Sends a chat message to conference participants (i.e. broadcast sans room name)
+     * @param inputMessage Message to send
+     * @param playerName Player name to send as
+     */
+    public void sendChat(String playerName, String inputMessage)
+    {
+        String message = ChatColor.BLUE + playerName + ChatColor.AQUA + ": " + inputMessage;
+        for (Player participants : this.participants)
+            participants.sendMessage(message);
+    }
 }

@@ -155,7 +155,7 @@ public class Conference extends JavaPlugin implements Listener
                 player.sendMessage(notInAConference);
                 return true;
             }
-            room.sendBroadcast(player.getName() + ": " + ChatColor.AQUA + StringUtils.join(args, " "));
+            room.sendChat(player.getName(), StringUtils.join(args, " "));
             return true;
         }
 
