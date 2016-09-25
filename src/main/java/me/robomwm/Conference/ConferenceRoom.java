@@ -75,7 +75,7 @@ public class ConferenceRoom
      */
     public void sendChat(String playerName, String inputMessage)
     {
-        String message = ChatColor.BLUE + playerName + ChatColor.AQUA + ": " + inputMessage;
+        String message = ChatColor.DARK_AQUA + playerName + ": " + ChatColor.AQUA + inputMessage;
         for (Player participants : this.participants)
             participants.sendMessage(message);
     }
