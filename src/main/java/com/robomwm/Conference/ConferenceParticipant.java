@@ -1,6 +1,4 @@
-package me.robomwm.Conference;
-
-import org.bukkit.entity.Player;
+package com.robomwm.Conference;
 
 /**
  * Created by robom on 5/22/2016.

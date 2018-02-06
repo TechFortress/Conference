@@ -1,4 +1,4 @@
-package me.robomwm.Conference;
+package com.robomwm.Conference;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -102,7 +102,7 @@ public class ConferenceManager
      * Used internally
      * Removes a room if nobody is inside it.
      */
-    public void removeRoomIfEmpty(String roomString)
+    private void removeRoomIfEmpty(String roomString)
     {
         if (this.conferenceRooms.get(roomString).isEmpty())
             this.conferenceRooms.remove(roomString);

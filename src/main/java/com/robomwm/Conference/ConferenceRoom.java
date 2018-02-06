@@ -1,4 +1,4 @@
-package me.robomwm.Conference;
+package com.robomwm.Conference;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -12,8 +12,8 @@ import java.util.Set;
  */
 public class ConferenceRoom
 {
-    String name = "";
-    Set<Player> participants = new HashSet<>();
+    private String name;
+    private Set<Player> participants = new HashSet<>();
 
     ConferenceRoom(String name, Player player)
     {

@@ -1,16 +1,31 @@
 name: Conference
 author: RoboMWM
 version: ${project.version}
-main: me.robomwm.Conference.Conference
+main: com.robomwm.Conference.Conference
 commands:
     join:
-        usage: /join <conference room> - Joins a conference room. Automatically creates a new room if the specified room name does not exist.
+        usage: /join <conference room> - Joins a private conference room. Automatically creates a new room if the specified room name does not exist.
         aliases: [cjoin]
+        permission: conference.join
     part:
         aliases: [leave, quit, cquit]
     c:
-        usage: /c <message ...>
+        usage: /c or /. <message ...>
+        aliases: [.]
     confadmin:
         usage: /confadmin <delete|view|check|part|broadcast> [player|room]
+        permission: conference.admin
     who:
         aliases: [see, clist]
+permissions:
+    conference.*:
+        description: Grants ALL THE THINGS
+        children:
+            conference.join: true
+            conference.admin: true
+    conference.join:
+        description: Permission to /join
+        default: true
+    conference.admin:
+        description: Permission to /confadmin
+        default: op

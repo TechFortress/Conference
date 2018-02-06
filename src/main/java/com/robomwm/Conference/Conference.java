@@ -1,4 +1,4 @@
-package me.robomwm.Conference;
+package com.robomwm.Conference;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -10,8 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.*;
 
 /**
  * Created by robom on 5/21/2016.
@@ -33,94 +31,91 @@ public class Conference extends JavaPlugin implements Listener
         /**
          * Administrative commands
          */
-        if (sender.hasPermission("topkek"))
+        if (cmd.getName().equalsIgnoreCase("confadmin"))
         {
-            if (cmd.getName().equalsIgnoreCase("confadmin"))
-            {
-                if (args.length < 2)
-                    return false;
-
-                /**
-                 * Delete a conference
-                 */
-                if (args[0].equalsIgnoreCase("delete"))
-                {
-                    if (!conferenceManager.removeConferenceRoom(args[1]))
-                    {
-                        sender.sendMessage(args[1] + ChatColor.RED + " conference does not exist.");
-                        return true;
-                    }
-                    sender.sendMessage("Deleted conference " + args[1]);
-                    return true;
-                }
-
-                /**
-                 * View any conference's participants
-                 */
-                if (args[0].equalsIgnoreCase("view"))
-                {
-                    ConferenceRoom room = conferenceManager.getRoom(args[1]);
-
-                    if (room == null)
-                    {
-                        sender.sendMessage(args[1] + ChatColor.RED + " conference does not exist.");
-                        return true;
-                    }
-                    sender.sendMessage("Participants of " + room.getName());
-                    sender.sendMessage(room.getParticipantsToString());
-                    return true;
-                }
-
-                /**
-                 * Check what conference a player is part of
-                 */
-                if (args[0].equalsIgnoreCase("check"))
-                {
-                    Player checkPlayer = Bukkit.getPlayerExact(args[1]);
-                    if (checkPlayer == null)
-                    {
-                        sender.sendMessage(args[1] + " does not exist/is not online.");
-                        return true;
-                    }
-                    ConferenceRoom room = conferenceManager.getParticipantRoom(checkPlayer);
-                    if (room == null)
-                    {
-                        sender.sendMessage("Player is not part of a conference");
-                        return true;
-                    }
-                    sender.sendMessage(room.getName());
-                    return true;
-                }
-
-                /**
-                 * Forcequit a player from a conference
-                 */
-                if (args[0].equalsIgnoreCase("part"))
-                {
-                    Player partPlayer = Bukkit.getPlayerExact(args[1]);
-                    if (partPlayer != null && conferenceManager.removeParticipant(partPlayer, true))
-                        sender.sendMessage("Successfully parted " + partPlayer.getName());
-                    else
-                        sender.sendMessage("Was unable to part player. Either player is not online or is not part of a conference.");
-                    return true;
-                }
-
-                /**
-                 * Broadcast a message to a specific room
-                 */
-                if (args[0].equalsIgnoreCase("broadcast"))
-                {
-                    ConferenceRoom room = conferenceManager.getRoom(args[1]);
-                    if (room == null)
-                    {
-                        sender.sendMessage("That room does not exist.");
-                        return true;
-                    }
-                    room.sendBroadcast(StringUtils.join(args, " ", 2, args.length));
-                    return true;
-                }
+            if (args.length < 2)
                 return false;
+
+            /**
+             * Delete a conference
+             */
+            if (args[0].equalsIgnoreCase("delete"))
+            {
+                if (!conferenceManager.removeConferenceRoom(args[1]))
+                {
+                    sender.sendMessage(args[1] + ChatColor.RED + " conference does not exist.");
+                    return true;
+                }
+                sender.sendMessage("Deleted conference " + args[1]);
+                return true;
             }
+
+            /**
+             * View any conference's participants
+             */
+            if (args[0].equalsIgnoreCase("view"))
+            {
+                ConferenceRoom room = conferenceManager.getRoom(args[1]);
+
+                if (room == null)
+                {
+                    sender.sendMessage(args[1] + ChatColor.RED + " conference does not exist.");
+                    return true;
+                }
+                sender.sendMessage("Participants of " + room.getName());
+                sender.sendMessage(room.getParticipantsToString());
+                return true;
+            }
+
+            /**
+             * Check what conference a player is part of
+             */
+            if (args[0].equalsIgnoreCase("check"))
+            {
+                Player checkPlayer = Bukkit.getPlayerExact(args[1]);
+                if (checkPlayer == null)
+                {
+                    sender.sendMessage(args[1] + " does not exist/is not online.");
+                    return true;
+                }
+                ConferenceRoom room = conferenceManager.getParticipantRoom(checkPlayer);
+                if (room == null)
+                {
+                    sender.sendMessage("Player is not part of a conference");
+                    return true;
+                }
+                sender.sendMessage(room.getName());
+                return true;
+            }
+
+            /**
+             * Forcequit a player from a conference
+             */
+            if (args[0].equalsIgnoreCase("part"))
+            {
+                Player partPlayer = Bukkit.getPlayerExact(args[1]);
+                if (partPlayer != null && conferenceManager.removeParticipant(partPlayer, true))
+                    sender.sendMessage("Successfully parted " + partPlayer.getName());
+                else
+                    sender.sendMessage("Was unable to part player. Either player is not online or is not part of a conference.");
+                return true;
+            }
+
+            /**
+             * Broadcast a message to a specific room
+             */
+            if (args[0].equalsIgnoreCase("broadcast"))
+            {
+                ConferenceRoom room = conferenceManager.getRoom(args[1]);
+                if (room == null)
+                {
+                    sender.sendMessage("That room does not exist.");
+                    return true;
+                }
+                room.sendBroadcast(StringUtils.join(args, " ", 2, args.length));
+                return true;
+            }
+            return false;
         }
 
 
@@ -185,11 +180,10 @@ public class Conference extends JavaPlugin implements Listener
             }
             //Don't return false if not in room, instead command doesn't exist.
         }
-        sender.sendMessage("Whoops, did you make a mistake? Don't forget about " + ChatColor.GOLD + "/help");
-        return true;
+        return false; //shouldn't get here
     }
 
-    void joinConference(String conference, Player player)
+    private void joinConference(String conference, Player player)
     {
         if (conference.startsWith("#"))
             conference = conference.substring(1);
@@ -211,7 +205,7 @@ public class Conference extends JavaPlugin implements Listener
     }
 
     @EventHandler
-    void onPlayerQuit(PlayerQuitEvent event)
+    private void onPlayerQuit(PlayerQuitEvent event)
     {
         conferenceManager.removeParticipant(event.getPlayer(), true);
     }
