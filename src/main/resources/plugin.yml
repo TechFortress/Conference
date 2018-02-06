@@ -10,8 +10,8 @@ commands:
     part:
         aliases: [leave, quit, cquit]
     c:
-        usage: /c or /. <message ...>
-        aliases: [.]
+        usage: // <message ...> or /c <message ...> - Sends a message to the conference room.
+        aliases: [/,.]
     confadmin:
         usage: /confadmin <delete|view|check|part|broadcast> [player|room]
         permission: conference.admin

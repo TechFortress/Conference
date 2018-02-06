@@ -197,7 +197,7 @@ public class Conference extends JavaPlugin implements Listener
 
         if(conferenceManager.addParticipant(player, conference))
         {
-            player.sendMessage("Use " + ChatColor.GOLD + "/c <message> " + ChatColor.RESET + "to send messages to the room.");
+            player.sendMessage("Use " + ChatColor.GOLD + "// <message> " + ChatColor.RESET + "to send messages to the room.");
             player.sendMessage("Use " + ChatColor.GOLD + "/part " + ChatColor.RESET + "to leave the conference.");
             player.sendMessage("Use " + ChatColor.GOLD + "/who " + ChatColor.RESET + "to see who's in this room.");
             return;
